@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """ Flask Application """
 from os import getenv
-from flask import Flask
+from flask import Flask, jsonify
 from models import storage
 from api.v1.views import app_views
 
@@ -13,6 +13,12 @@ app.register_blueprint(app_views, url_prefix='/api/v1')
 def teardown_appcontext(exception):
     """ Close storage """
     storage.close()
+
+
+@app.errorhandler(404)
+def not_found(error):
+    """ Handler for 404 errors that retutns JSON response """
+    return jsonify({"error": "Not found"}), 404
 
 
 if __name__ == "__main__":
