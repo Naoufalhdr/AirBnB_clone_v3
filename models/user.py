@@ -6,6 +6,7 @@ from os import getenv
 import sqlalchemy
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
+from hashlib import md5
 
 
 class User(BaseModel, Base):
@@ -25,5 +26,20 @@ class User(BaseModel, Base):
         last_name = ""
 
     def __init__(self, *args, **kwargs):
-        """initializes user"""
+        """Initialize user with hashed password"""
+        if 'password' in kwargs:
+            kwargs['password'] = self.hash_password(kwargs['password'])
         super().__init__(*args, **kwargs)
+
+    @staticmethod
+    def hash_password(password):
+        """Hash a password using MD5"""
+        return md5(password.encode()).hexdigest()
+
+    @property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, value):
+        self._password = self.hash_password(value)
